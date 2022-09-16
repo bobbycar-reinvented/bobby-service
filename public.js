@@ -95,6 +95,11 @@ async function renderEJS(req, res, next) {
     url = url.substring(0, url.includes('.') ? url.lastIndexOf('.') : url.length);
     const file = 'public' + url;
 
+    if (file.includes('..')) {
+        next();
+        return;
+    }
+
     res.render(file, { data: options }, (err, html) => {
         if (err) {
             next()

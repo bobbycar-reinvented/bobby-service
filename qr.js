@@ -4,6 +4,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const rateLimit = require("express-rate-limit");
+const { checkUsername } = require('./utils');
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -17,6 +18,13 @@ const files = {};
 
 function handleQr(req, res, next) {
     const { username } = req.params;
+
+    if (!checkUsername(username)) {
+        console.log('invalid username: ' + username);
+        res.status(400).send('invalid username');
+        return;
+    }
+
     const filepath = path.join(__dirname, 'tmp', username + '.qr');
 
     if (!fs.existsSync(filepath)) {
@@ -31,6 +39,12 @@ function handleQr(req, res, next) {
 
 function saveQR(username, data) {
     const filepath = path.join(__dirname, 'tmp', username + '.qr');
+
+    if (!checkUsername(username)) {
+        console.log('invalid username: ' + username);
+        return;
+    }
+
     files[username] = {
         path: filepath,
         invalid_at: Date.now() + 1000 * 60 * 5, // 5 minutes
@@ -41,6 +55,12 @@ function saveQR(username, data) {
 
 function deleteQR(username) {
     const filepath = path.join(__dirname, 'tmp', username + '.qr');
+
+    if (!checkUsername(username)) {
+        console.log('invalid username: ' + username);
+        return;
+    }
+
     fs.unlinkSync(filepath);
     delete files[username];
     console.log('deleted qr for ' + username);
