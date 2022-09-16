@@ -1,0 +1,154 @@
+.min-vh-80 {
+  min-height: 80vh !important;
+}
+
+.row.min-vh-80 {
+  align-content: center;
+}
+
+.row.min-vh-80 > .col-lg-6 {
+  min-height: 80vh;
+}
+
+.col-lg-6 > .p-5 {
+  margin-top: 50%;
+}
+
+.sidebar-brand:hover {
+  color: #bbb;
+}
+
+.sidebar-brand {
+  transition: all 0.5s ease;
+}
+
+.bobby-nvs-reset {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.bobby-nvs-set:not([data-type="bool"]) {
+  border-radius: 0 !important;
+}
+
+.bobby-nvs-set[data-type="bool"] {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.font-consolas {
+  font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", "Courier New", Courier, monospace;
+}
+
+#collapseNvsTable {
+  min-width: max-content !important;
+}
+
+#alerts {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+#alerts > * {
+  transition: opacity 0.333s ease-in-out;
+  opacity: 0;
+  max-width: 33.333%;
+  min-width: 275px;
+  margin: 10px;
+  float: right;
+}
+
+#accordionSidebar {
+  transition: width 0.4s ease !important;
+}
+
+.error-svg {
+  max-height: 30vh;
+}
+
+#bobbycar-color {
+  width: 80px;
+}
+
+.radius-fix {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: none !important;
+}
+
+.group-dropdown {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-radius: 0.25em;
+  border: 1px solid #d1d3e2;
+  background-color: #fff;
+  flex: 1 1 auto;
+}
+
+.hr-spacing > hr {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.js-only:not(button, a):not(.js-available) {
+  display: none !important;
+}
+
+a.js-only:not(.js-available) {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.65;
+}
+
+.width-max-content {
+  min-width: max-content !important;
+}
+
+.container-nvs {
+  overflow-x: scroll !important;
+}
+
+.w-maxc {
+  width: max-content !important;
+}
+
+.w-minc {
+  width: min-content !important;
+}
+
+.h-maxc {
+  height: max-content !important;
+}
+
+.h-minc {
+  height: min-content !important;
+}
+
+.bobbycar-connected {
+  display: none;
+  transition: all 1s ease !important;
+  opacity: 0;
+}
+
+.bobbycar-not-connected {
+  transition: all 1s ease !important;
+  opacity: 1;
+}
+
+@media only screen and (max-width: 22.6em) {
+  #wrapper {
+    width: max-content !important;
+  }
+}
+
+#remote-control-niple {
+  width: 200px;
+  height: 200px;
+  background-color: #d1d3e2;
+  position: relative;
+}

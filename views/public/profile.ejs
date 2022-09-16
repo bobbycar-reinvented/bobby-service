@@ -1,0 +1,60 @@
+<%- include('../templates/header', {data}) %> 
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">Profile</h1>
+
+    <div class="row">
+
+        <div class="col-lg-4">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Profile Picture</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <img class="img-fluid px-3 px-sm-4 mt-3 mb-4 rounded" style="width: 15rem;" src="<%- data.profile_picture %>"
+                            alt="">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-center">
+                        <%- data.profile_picture_text %>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Account Details</h6>
+                </div>
+                <div class="card-body">
+                    <%- data.account_details %>
+                </div>
+                <div class="card-footer">
+                    <a href="/api/logout" class="btn btn-danger btn-icon-split float-right">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </span>
+                        <span class="text">Logout</span>
+                    </a>
+                    <a href="/api/manage" target="_blank" class="btn btn-info btn-icon-split float-right mr-2">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                        <span class="text">Manage <%- data.user_type %>  Settings</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!-- /.container-fluid -->
+<%- include('../templates/footer', {data}) %> 

@@ -1,0 +1,168 @@
+<%- include('../templates/header', {data}) %>
+
+<script src="/js/jsQR.js"></script>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <h1 class="h3 mb-4 text-gray-800">QR Manager</h1>
+
+    <noscript class="alert alert-danger">
+        <strong>Warning!</strong> You need to enable JavaScript to use this site.
+    </noscript>
+
+    <div class="card mb-4 py-3 border-left-primary js-only">
+        <div class="card-body form-check hr-spacing">
+            <% if(data.bobbycars.length > 0) { %>
+            <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>
+            <canvas id="canvas" hidden></canvas>
+            <div id="output" hidden>
+                <div id="outputMessage">No QR code detected.</div>
+                <div hidden><b>Data:</b> <span id="outputData"></span></div>
+            </div>
+            
+            <div class="input-group mb-3 width-max-content">
+                <span class="input-group-text radius-fix border-left-secondary" id="bobby-select">Select
+                    Bobbycar</span>
+                <select id="bobbycar" class="form-select group-dropdown"
+                    aria-label="Select Bobbycar" required name="bobbycar">
+                    <%
+                        for (const bobbycar of data.bobbycars) {
+                            if (bobbycar.type === 'anhaenger') {
+                                continue;
+                            }
+                    %>
+                        <option value="<%- bobbycar.ota_name %>"><%- bobbycar.ota_name %></option>
+                    <% } %>
+                </select>
+            </div>
+
+            <button id="rescan" style="display:none;" onclick="rescan()">Rescan</button>
+        </div>
+
+        <script>
+            if (location.protocol != 'https:') {
+                location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+            }
+
+            var waitingForRequest = false;
+
+            function onScanSuccess(decodedText) {
+                if (waitingForRequest) {
+                    return;
+                }
+
+                waitingForRequest = true;
+
+                fetch('https://service.bobbycar.cloud/api/qr/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        decodedText: decodedText,
+                        bobbycar: document.getElementById('bobbycar').value
+                    })
+                }).then(data => {
+                    waitingForRequest = false;
+
+                    if (data.status === 200) {
+                        alert('Successfully saved qr code');
+                    } else {
+                        data.json().then(json => {
+                            if (json.error) {
+                                alert(json.error);
+                            } else {
+                                alert('Unknown error');
+                            }
+                        }).catch(() => {
+                            alert('Error saving qr code');
+                        });
+                    }
+                }).catch(error => {
+                    alert(`Error: ${error}`);
+                    waitingForRequest = false;
+                });
+            }
+            
+            function rescan() {
+                scanning = true;
+                rescanBtn.style.display = 'none';
+                outputMessage.innerHTML = '';
+            }
+
+            const video = document.createElement('video');
+            const canvasElement = document.getElementById('canvas');
+            const canvas = canvasElement.getContext('2d');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const outputContainer = document.getElementById('output');
+            const outputMessage = document.getElementById('outputMessage');
+            const outputData = document.getElementById('outputData');
+
+            const rescanBtn = document.getElementById('rescan');
+
+            var scanning = true;
+
+            function drawLine(begin, end, color) {
+                canvas.beginPath();
+                canvas.moveTo(begin.x, begin.y);
+                canvas.lineTo(end.x, end.y);
+                canvas.lineWidth = 4;
+                canvas.strokeStyle = color;
+                canvas.stroke();
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then((stream) => {
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true);
+                video.play();
+                requestAnimationFrame(tick);
+            });
+
+            function tick() {
+                loadingMessage.innerText = "⌛ Loading video...";
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    loadingMessage.hidden = true;
+                    canvasElement.hidden = false;
+                    outputContainer.hidden = false;
+
+                    canvasElement.height = video.videoHeight;
+                    canvasElement.width = video.videoWidth;
+
+                    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                    var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+
+                    if (scanning) {
+                        var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: 'dontInvert',
+                        });
+                        if (code) {
+                            scanning = false;
+                            rescanBtn.style.display = 'block';
+                            drawLine(code.location.topLeftCorner, code.location.topRightCorner, '#FF3B58');
+                            drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+                            drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+                            drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+                            outputMessage.hidden = true;
+                            outputData.parentElement.hidden = false;
+                            outputData.innerText = code.data;
+                            onScanSuccess(code.data);
+                        } else {
+                            outputMessage.hidden = false;
+                            outputData.parentElement.hidden = true;
+                        }
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+        </script>
+        <% } else { %>
+            <h2>Error: No Bobbycars found.</h1>
+            <a href="/bobbycars/new" class="btn btn-primary">Add a new Bobbycar</a>
+        <% } %>
+    </div>
+    
+</div>
+<!-- /.container-fluid -->
+<%- include('../templates/footer', {data}) %> 

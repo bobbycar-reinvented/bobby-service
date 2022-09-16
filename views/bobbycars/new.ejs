@@ -1,0 +1,255 @@
+<%- include('../templates/header', {data}) %>
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <% if (data.req.query.edit) { %>
+            <h1 class="h3 mb-4 text-gray-800">Edit bobbycar</h1>
+        <% } else { %>
+            <h1 class="h3 mb-4 text-gray-800">Add a new bobbycar</h1>
+        <% } %>
+
+        <noscript class="alert alert-danger">
+            <strong>Warning!</strong> You need to enable JavaScript to use this site.
+        </noscript>
+
+        <div class="card mb-4 pb-3 border-left-primary js-only">
+            <div class="card-body form-check hr-spacing">
+                <form method="post" action="/api/bobbycars/new" id="bobbycar-form">
+
+                    <input type="hidden" name="edit-id" value="<%- data.req.query.edit %>">
+
+                    <div>
+                        <h5 class="mb-1 text-center">Bobbycar Name</h5>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text radius-fix border-left-danger" id="bobby-name-addon">Enter
+                                Bobbycar Name</span>
+                            <input type="text" class="form-control" placeholder="Rotes Bobbycar"
+                                aria-label="Rotes Bobbycar" aria-describedby="bobby-name-addon" required name="name"
+                                maxlength="20" id="bobby-name">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div>
+                        <h5 class="mb-1 text-center">Bobbycar Type</h5>
+                        <div class="input-group mb-3 width-max-content">
+                            <span class="input-group-text radius-fix border-left-warning" id="bobby-type-addon">Enter
+                                Bobbycar Type</span>
+                            <select id="bobbycar-type" class="form-select group-dropdown"
+                                aria-label="Select Bobbycar Type" required name="type">
+                                <option value="" selected>Select Type</option>
+                                <option value="bobbycar">Bobbycar</option>
+                                <option value="bobbyquad">Bobbyquad</option>
+                                <option value="anhaenger">Anhänger</option>
+                            </select>
+                        </div>
+                        <div class="input-group mb-3 anhaenger-hidden">
+                            <span class="input-group-text radius-fix border-left-warning" id="bobby-ota-name-addon">Enter
+                                Bobbycar OTA Name</span>
+                            <input type="text" class="form-control anhaenger-hidden" placeholder="Can be found in NVS"
+                                aria-label="Can be found in NVS" aria-describedby="bobby-ota-name-addon" required name="ota_name"
+                                maxlength="20">
+                        </div>
+                        <div class="input-group mb-3 anhaenger-hidden">
+                            <span class="input-group-text radius-fix border-left-warning" id="bobby-password-addon">Enter
+                                Bobbycar Web Password</span>
+                            <input type="text" class="form-control anhaenger-hidden" placeholder="Set this in NVS afterwards"
+                                aria-label="Set this in NVS afterwards" aria-describedby="bobby-password-addon" required name="password"
+                                maxlength="20">
+                        </div>
+                    </div>
+
+                    <hr class="anhaenger-hidden">
+
+                    <div class="anhaenger-hidden">
+                        <h5 class="mb-1 text-center">Visual Information</h5>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text radius-fix border-left-success" id="bobby-color-addon">Enter
+                                Bobbycar Color</span>
+                            <input type="color" class="form-control form-control-color" id="bobbycar-color"
+                                value="#563d7c" title="Choose your color" name="color">
+                        </div>
+                    </div>
+
+                    <hr class="anhaenger-hidden">
+
+                    <div class="anhaenger-hidden">
+                        <h5 class="mb-1 text-center">Battery Information</h5>
+                        <div class="input-group mb-3">
+                            <div class="input-group mb-1">
+                                <span class="input-group-text radius-fix border-left-info">Enter Battery Count
+                                    (Series)</span>
+                                <input type="number" class="form-control" placeholder="12" min="1"
+                                    name="battery-series">
+                            </div>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text radius-fix border-left-secondary">Enter Battery Count
+                                    (Parallel)</span>
+                                <input type="number" class="form-control" placeholder="10" min="1"
+                                    name="battery-parallel">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="anhaenger-hidden">
+
+                    <div class="anhaenger-hidden">
+                        <h5 class="mb-1 text-center">Hardware Information</h5>
+
+                        <div class="input-group justify-content-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input bobby-checkbox" type="checkbox" value=""
+                                    id="bobby-features-two-platines" name="four-wheel-drive">
+                                <input type="hidden" name="four-wheel-drive" value="false" id="bobby-features-two-platines-hidden">
+                                <label class="form-check-label" for="bobby-features-two-platines">Four Wheel
+                                    Drive</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input bobby-checkbox" type="checkbox" value=""
+                                    id="bobby-features-ledstrip" name="ledstrip">
+                                <input type="hidden" name="ledstrip" value="false" id="bobby-features-ledstrip-hidden">
+                                <label class="form-check-label" for="bobby-features-ledstrip">Ledstrip</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input bobby-checkbox" type="checkbox" value=""
+                                    id="bobby-features-frontled" name="frontled">
+                                <input type="hidden" name="frontled" value="false" id="bobby-features-frontled-hidden">
+                                <label class="form-check-label" for="bobby-features-frontled">Front LED</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input bobby-checkbox" type="checkbox" value=""
+                                    id="bobby-features-bobbyarsch" name="bobbyarsch">
+                                <input type="hidden" name="bobbyarsch" value="false" id="bobby-features-bobbyarsch-hidden">
+                                <label class="form-check-label"
+                                    for="bobby-features-bobbyarsch">Bobbyarsch&trade;</label>
+                            </div>
+                        </div>
+
+                        <div class="input-group mb-1 justify-content-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="bus" id="bobby-bus-radio-can" value="can"
+                                    checked>
+                                <label class="form-check-label" for="bobby-bus-radio-can">
+                                    CAN
+                                </label>
+                            </div>
+                            <div class="form-check mx-1">
+                                <input class="form-check-input" type="radio" name="bus" id="bobby-bus-radio-serial" value="serial">
+                                <label class="form-check-label" for="bobby-bus-radio-serial">
+                                    Serial
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="bus" id="bobby-bus-radio-analog" value="analog">
+                                <label class="form-check-label" for="bobby-bus-radio-analog">
+                                    Analog
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="input-group mb-1 justify-content-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="trigger"
+                                    id="bobby-trigger-radio-xbox" value="xbox" checked>
+                                <label class="form-check-label" for="bobby-trigger-radio-xbox">
+                                    XBOX 360 Trigger
+                                </label>
+                            </div>
+                            <div class="form-check mx-1">
+                                <input class="form-check-input" type="radio" name="trigger"
+                                    id="bobby-trigger-radio-m365" value="m365">
+                                <label class="form-check-label" for="bobby-trigger-radio-m365">
+                                    M365 Trigger
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="trigger"
+                                    id="bobby-trigger-radio-both" value="both">
+                                <label class="form-check-label" for="bobby-trigger-radio-both">
+                                    Both
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col-sm-6">
+                                <div class="card mb-4 pb-3 border-left-dark">
+                                    <div class="card-body">
+                                        <h5 class="mb-1 text-center">Front</h5>
+
+                                        <div class="input-group mb-3 width-max-content">
+                                            <span class="input-group-text radius-fix border-left-warning"
+                                                id="bobby-tire-addon-front">Select Tire</span>
+                                            <select id="bobbycar-tire" class="form-select group-dropdown anhaenger-hidden"
+                                                aria-label="Select Bobbycar Tire" required name="tire-front">
+                                                <option value="plastic">Plastic (No motor)</option>
+                                                <option value="solid-65" selected>Solid Tires (6.5")</option>
+                                                <option value="solid-85">Solid Tires (8.5")</option>
+                                                <option value="air-10">Tire (10")</option>
+                                                <option value="air-105">Tire (10.5")</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-group mb-3 width-max-content">
+                                            <span class="input-group-text radius-fix border-left-warning"
+                                                id="bobby-pcb-addon-front">Select PCB</span>
+                                            <select id="bobbycar-pcb" class="form-select group-dropdown anhaenger-hidden"
+                                                aria-label="Select Bobbycar PCB" required name="pcb-front">
+                                                <option value="0">None</option>
+                                                <option value="1" selected>Peters Platine (V1)</option>
+                                                <option value="2">Flughafens Platine (V2)</option>
+                                                <option value="3">Peters Platine 2.0 (V3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="card mb-4 pb-3 border-left-dark">
+                                    <div class="card-body">
+                                        <h5 class="mb-1 text-center">Back</h5>
+
+                                        <div class="input-group mb-3 width-max-content">
+                                            <span class="input-group-text radius-fix border-left-warning"
+                                                id="bobby-tire-addon-back">Select Tire</span>
+                                            <select id="bobbycar-tire" class="form-select group-dropdown"
+                                                aria-label="Select Bobbycar Tire" required name="tire-back">
+                                                <option value="plastic">Plastic (No motor)</option>
+                                                <option value="solid-65" selected>Solid Tires (6.5")</option>
+                                                <option value="solid-85">Solid Tires (8.5")</option>
+                                                <option value="air-10">Tire (10")</option>
+                                                <option value="air-105">Tire (10.5")</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-group mb-3 width-max-content">
+                                            <span class="input-group-text radius-fix border-left-warning"
+                                                id="bobby-pcb-addon-back">Select PCB</span>
+                                            <select id="bobbycar-pcb" class="form-select group-dropdown"
+                                                aria-label="Select Bobbycar PCB" required name="pcb-back">
+                                                <option value="0">None</option>
+                                                <option value="1" selected>Peters Platine (V1)</option>
+                                                <option value="2">Flughafens Platine (V2)</option>
+                                                <option value="3">Peters Platine 2.0 (V3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (data.req.query.edit) { %>
+                        <button id="bobbycar-send" type="submit" class="btn btn-primary btn-block">Edit bobbycar</button>
+                    <% } else { %>
+                        <button id="bobbycar-send" type="submit" class="btn btn-primary btn-block">Add bobbycar</button>
+                    <% } %>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+    <%- include('../templates/footer', {data}) %>

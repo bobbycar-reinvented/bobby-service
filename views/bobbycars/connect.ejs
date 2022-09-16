@@ -1,0 +1,161 @@
+<%- include('../templates/header', {data}) %>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+<script src="/js/nipplejs.js"></script>
+<script src="/js/reconnecting-websocket.min.js"></script>
+<script src="/js/bobbyws.js"></script>
+<script src="/js/qrcode.min.js"></script>
+
+    <div class="container-fluid">
+        <noscript class="alert alert-danger d-flex justify-content-center">
+            <strong>Warning!</strong> You need to enable JavaScript to use this site.
+        </noscript>
+
+        <div class="js-only">
+
+            <div class="bobbycar-not-connected container-fluid">
+                <h2 class="text-center mb-5">Bobbycar is not connected</h2>
+                <div class="text-center mb-5">
+                    <img src="/img/undraw_sync.svg" alt="" class="img error-svg">
+                </div>
+                <div class="text-center">
+                    <button onclick="location.reload()" id="btn-try-again" class="btn btn-primary btn-lg">Try again...</button>
+                </div>
+            </div>
+
+            <div class="bobbycar-connected">
+                <div class="container-fluid container-infos">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 id="info-loading">
+                            Infos not loaded
+                        </h2>
+                        <a href="#collapseInfos" data-toggle="collapse" class="btn btn-danger btn-sm h-maxc collapse-toggler" id="info-expander"><i id="info-toggler-icon" class="bi bi-caret-down-fill"></i></a>
+                    </div>
+                    <div id="infos-loading-progress"></div>
+                    <div class="collapse show" id="collapseInfos"></div>
+                </div>
+
+                <hr>
+
+                <div class="container-fluid container-controlls">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 id="info-loading">
+                            Controls
+                        </h2>
+                        <a href="#collapseControls" data-toggle="collapse" class="btn btn-warning btn-sm h-maxc collapse-toggler" id="controls-expander"><i id="controls-toggler-icon" class="bi bi-caret-down-fill"></i></a>
+                    </div>
+                    <div class="collapse show" id="collapseControls">
+                        <div class="container-fluid mb-2">
+                            <% for (let i = 0; i < 16; i++) { %>
+                                <button onclick="handle_raw_button(this)" class="btn btn-primary btn-sm m-1" data-btn-id="<%- i %>">RawButton<%- i %></button>
+                            <% } %>
+                            <hr>
+                            <% for (let i = 0; i < 16; i++) { %>
+                                <button onclick="handle_button(this)" class="btn btn-primary btn-sm m-1" data-btn-id="<%- i %>"><%- data.button_array[i] %></button>
+                            <% } %>
+                            <div class="btn btn-primary btn-sm m-1" id="display-control-button">Click to use keyboard</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="container-fluid container-test2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 id="info-loading">
+                            Remote Display
+                        </h2>
+                        <a href="#collapseTest2" data-toggle="collapse" class="btn btn-primary btn-sm h-maxc collapse-toggler" id="test2-expander"><i id="test2-toggler-icon" class="bi bi-caret-down-fill"></i></a>
+                    </div>
+                    <div class="collapse show" id="collapseTest2">
+                        <div id="display-remote"></div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="container-fluid container-nvs">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 id="nvs-loading">
+                            NVS not loaded
+                        </h2>
+                        <a href="#collapseNvsTable" data-toggle="collapse" class="btn btn-success btn-sm h-maxc collapsed collapse-toggler" id="nvs-expander"><i id="nvs-toggler-icon" class="bi bi-caret-left-fill"></i></a>
+                    </div>
+                    <div id="nvs-loading-progress" class="mb-2"></div>
+                    <div class="collapse" id="collapseNvsTable">
+                        <div class="container-fluid mb-2">
+                            <button onclick="ws.download_nvs()" disabled class="btn btn-primary btn-sm enable-nvs-loaded">Download NVS</button>
+                            <button onclick="ws.import_nvs()" disabled class="btn btn-warning btn-sm enable-nvs-loaded">Import NVS</button>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">NVS Key</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Default Value</th>
+                                    <th scope="col">Type</th>
+                                </tr>
+                            </thead>    
+                            <tbody id="display-nvs"></tbody>             
+                        </table>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="container-fluid container-test3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 id="info-loading">
+                            Test3
+                        </h2>
+                        <a href="#collapseTest3" data-toggle="collapse" class="btn btn-secondary btn-sm h-maxc collapse-toggler" id="test3-expander"><i id="test3-toggler-icon" class="bi bi-caret-down-fill"></i></a>
+                    </div>
+                    <div class="collapse show" id="collapseTest3">
+                            Test3
+                    </div>
+                </div>
+
+                <div class="modal fade" id="bobbyImportNvsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                    aria-labelledby="bobbyImportNvsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="bobbyImportNvsModalLabel">Import NVS</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="nvs-file" class="form-label">Upload nvs json</label>
+                                    <input class="form-control" type="file" id="nvs-file" accept="application/json" onchange="ws.import_nvs_file(this)" />
+                                </div>                                  
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="bobbyLoginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="bobbyLoginModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bobbyLoginModalLabel">Enter Bobbycar Password (<%- data.bobbycar.name %>)</h5>
+                    </div>
+                    <div class="modal-body">
+                        <input type="password" id="bobbycarPassword" class="form-control" />
+                        <br />
+                        <button class="toggle-visibility btn btn-primary btn-sm" type="button" for="bobbycarPassword">Show Password</button>
+                        <button class="save-password btn btn-success btn-sm" type="button" for="bobbycarPassword">Save Password</button>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="/bobbycars/<%- data.bobbycar.owner %>/<%- data.bobbycar.name %>" class="btn btn-primary">Go back to main page</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- /.container-fluid -->
+    <%- include('../templates/footer', {data}) %>
