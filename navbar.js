@@ -64,8 +64,6 @@ function generateGrafanaUrl(req) {
         return ''
     }
 
-    decryptedData = JSON.parse(decryptedData);
-
     return `<a class="collapse-item" target="_blank" href="https://grafana.bobbycar.cloud/d/r3_qLmtnk/bobbydashboard-v1-0"><i class="fas fa-fw fa-chart-area"></i>Grafana</a>`;
 }
 

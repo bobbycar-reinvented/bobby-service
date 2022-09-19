@@ -46,17 +46,20 @@ function verify(req, res, next) {
     const token = get_token(req);
 
     if (!token) {
+        console.log('No token provided');
         res.sendStatus(401);
         return;
     }
     let decryptedData = AES_256_GCM_decrypt(token);
     if (!decryptedData) {
+        console.log('Invalid token provided');
         res.sendStatus(401);
         return;
     }
 
     decryptedData = JSON.parse(decryptedData);
     if (decryptedData.valid_until < Date.now()) {
+        console.log('Token expired');
         res.clearCookie('auth');
         res.sendStatus(401);
         return;
@@ -202,6 +205,7 @@ async function handleOauthLogin(access_token, scope, token_type, res) {
                 username,
                 type: 'github',
                 remember: true,
+                access_token,
                 valid_until: Date.now() + LOGIN_VALID, // 30 days
             });
 
@@ -295,7 +299,7 @@ router.use('/logout', (req, res, next) => {
 });
 
 router.use('/login/github', (req, res, next) => {
-    res.redirect(`https://github.com/login/oauth/authorize?client_id=${github_client_id}&scope=read:org,read:user`);
+    res.redirect(`https://github.com/login/oauth/authorize?client_id=${github_client_id}&scope=read:org,read:user,user:email,public_repo`);
 });
 
 router.use('/manage', (req, res, next) => {

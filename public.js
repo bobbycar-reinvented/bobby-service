@@ -45,9 +45,17 @@ function getHTMLTitle(req, override) {
 function getUsername(req) {
     const decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
-        return ''
+        return '';
     }
-    return JSON.parse(decryptedData).username
+    return JSON.parse(decryptedData).username;
+}
+
+function getDecryptedData(req) {
+    const decryptedData = AES_256_GCM_decrypt(get_token(req));
+    if (!decryptedData) {
+        return null;
+    }
+    return JSON.parse(decryptedData);
 }
 
 async function getHTMLProfilePicture(req, optional_userdata) {
@@ -110,7 +118,8 @@ async function renderEJS(req, res, next) {
 }
 
 async function generateRenderOptions(req) {
-    const username = getUsername(req);
+    const decryptedData = getDecryptedData(req);
+    const username = decryptedData ? decryptedData.username : '';
     const data = await getUserData(username);
     const profile_picture = await getHTMLProfilePicture(req, data);
     const account_details = await generateAccountDetails(req);
@@ -135,6 +144,8 @@ async function generateRenderOptions(req) {
         userdata: data || {},
         user_type: (data && data.hasOwnProperty('type')) ? capitalize(data.type) : 'Unknown',
         button_array,
+        decryptedData,
+        accessToken: decryptedData && decryptedData.hasOwnProperty('accessToken') ? decryptedData.accessToken : null,
     };
 }
 
