@@ -71,6 +71,15 @@ function verify(req, res, next) {
     next();
 }
 
+function checkOrigin(req, res, next) {
+    const origin = req.headers.origin;
+    if (origin === "https://service.bobbycar.cloud") {
+        next();
+    } else {
+        res.status(401).json({ error: 'Invalid Origin', origin }); // Unauthorized
+    }
+}
+
 function update(req, res, next) {
 
     const token = get_token(req);
