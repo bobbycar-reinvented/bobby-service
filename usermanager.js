@@ -1,5 +1,7 @@
 const { AES_256_GCM_decrypt, AES_256_GCM_encrypt } = require('/usr/share/bobbycar-generic/crypt')
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
+const authenticated_router = express.Router();
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const { github_client_id, github_client_secret, valid_orgs } = require('./config');
@@ -67,15 +69,6 @@ function verify(req, res, next) {
 
     req.decrypted = decryptedData
     next();
-}
-
-function checkOrigin(req, res, next) {
-    const origin = req.headers.origin;
-    if (origin === "https://service.bobbycar.cloud") {
-        next();
-    } else {
-        res.sendStatus(401); // Unauthorized
-    }
 }
 
 function update(req, res, next) {
@@ -293,16 +286,16 @@ router.post('/login', async (req, res) => {
     res.redirect('/');
 });
 
-router.use('/logout', (req, res, next) => {
+router.all('/logout', (req, res, next) => {
     res.clearCookie('auth');
     res.redirect('/');
 });
 
-router.use('/login/github', (req, res, next) => {
+router.all('/login/github', (req, res, next) => {
     res.redirect(`https://github.com/login/oauth/authorize?client_id=${github_client_id}&scope=read:org,read:user,user:email,public_repo`);
 });
 
-router.use('/manage', (req, res, next) => {
+router.all('/manage', (req, res, next) => {
     const token = req.cookies.auth;
     if (!token) {
         res.redirect(req.get('referer'));
@@ -325,7 +318,7 @@ router.use('/manage', (req, res, next) => {
     res.redirect(req.get('referer'));
 });
 
-router.use('/oauth/login', async (req, res, next) => {
+router.all('/oauth/login', async (req, res, next) => {
     const code = req.query.code;
 
     if (!code) {
@@ -348,46 +341,25 @@ router.use('/oauth/login', async (req, res, next) => {
     });
 });
 
+router.use('/secure', authenticated_router);
 
-router.get('/buero_klingel', async (req, res) => {
-    const { password } = req.query;
-
-    if (!password || password !== process.env.DEPPERTES_PASSWORT) {
-        res.redirect('https://youtu.be/dQw4w9WgXcQ');
-        return;
-    }
-
-    await axios({
-        method: 'get',
-        url: `https://maker.ifttt.com/trigger/buero_klingel_on/with/key/${process.env.IFTTT_KEY}`,
-    });
-
-    setTimeout(() => {
-        axios({
-            method: 'get',
-            url: `https://maker.ifttt.com/trigger/buero_klingel_off/with/key/${process.env.IFTTT_KEY}`,
-        });
-    }, 10);
-    setTimeout(() => {
-        axios({
-            method: 'get',
-            url: `https://maker.ifttt.com/trigger/buero_klingel_off/with/key/${process.env.IFTTT_KEY}`,
-        });
-    }, 2000);
-    res.sendStatus(200);
+router.use((req, res, next) => {
+    res.json(router.stack.map(r => r.route?.path).filter(r => r));
 });
 
+authenticated_router.use(verify);
 
-router.use(verify);
-
-router.use(checkOrigin);
-
-router.get('/userInfo', (req, res) => {
+authenticated_router.get('/userInfo', (req, res) => {
     res.json(req.decrypted);
 });
 
-router.use((req, res, next) => {
-    res.sendStatus(401);
+authenticated_router.get('/github_token', async (req, res) => {
+    const { access_token } = req.decrypted;
+    res.json({ access_token });
+});
+
+authenticated_router.use((req, res, next) => {
+    res.sendStatus(404);
 });
 
 module.exports = { router, get_token, checkOrigin, isLoggedIn, update, generateAccountDetails, verify };
