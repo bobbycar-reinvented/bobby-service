@@ -1,0 +1,16 @@
+<%- include('../templates/header', {data}) %>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+
+<!-- Begin Page Content -->
+<div class="container-fluid needs-github-api">
+    <h1>GitHub Feed</h1>
+    <div class="github-container">
+        <div class="pb-2 pt-2 github-feed" id="github-feed" data-organization="bobbycar-graz">
+            <div class="spinner-border text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+<%- include('../templates/footer', {data}) %> 

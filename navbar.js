@@ -91,6 +91,11 @@ const navbar = {
                     type: 'exec',
                     func: generateGrafanaUrl,
                 },
+                {
+                    url: '/github-feed',
+                    name: 'Github Feed',
+                    icon: 'bi-github'
+                }
             ],
             icon: 'fa-toolbox'
         },

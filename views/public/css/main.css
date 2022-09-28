@@ -37,7 +37,9 @@
 }
 
 .font-consolas {
-  font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", "Courier New", Courier, monospace;
+  font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console",
+    "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+    "Liberation Mono", "Nimbus Mono L", "Courier New", Courier, monospace;
 }
 
 #collapseNvsTable {
@@ -151,4 +153,57 @@ a.js-only:not(.js-available) {
   height: 200px;
   background-color: #d1d3e2;
   position: relative;
+}
+
+.github-feed {
+  display: flex;
+  justify-content: center;
+}
+
+.github-container {
+  border-radius: 1.25em;
+  background-color: #0d1117;
+  color: white;
+}
+
+.github-link, .github-link-2 {
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+
+.github-link-2:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.github-link:hover {
+  color: rgb(43, 132, 216);
+  text-decoration: none;
+}
+
+.event__info {
+  display: flex;
+  align-items: center;
+}
+
+.event__action_info {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 6px;
+  border-color: #30363d;
+  margin-left: 38px;
+  font-size: 0.8em;
+  font-family: 'Nimbus Sans L', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.github_branch {
+  color: #58a6ff;
+  background-color: rgba(56, 139, 253, 0.15);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.github_sha {
+  color: #58a6ff;
 }
