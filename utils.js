@@ -1,3 +1,5 @@
+import url from 'url';
+
 function capitalize(s) {
     return s.charAt(0).toUpperCase() + s.slice(1)
 }
@@ -20,7 +22,9 @@ function checkUsername(username) {
     return true; // username is valid
 }
 
-module.exports = {
+export const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+export {
     capitalize,
     sortBobbycarAlphabetically,
     checkUsername,

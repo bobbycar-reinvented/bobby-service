@@ -1,12 +1,13 @@
-const express = require('express')
-const router = express.Router()
-const { isLoggedIn, get_token, generateAccountDetails } = require('./usermanager')
-const { capitalize } = require('./utils')
-const { AES_256_GCM_decrypt } = require('/usr/share/bobbycar-generic/crypt')
-const { renderNavbar } = require('./navbar')
-const { getUserData, bobbyDB } = require('./db');
+import express from 'express';
+import { isLoggedIn, get_token, generateAccountDetails } from './usermanager.js';
+import { capitalize } from './utils.js';
+import { AES_256_GCM_decrypt } from '/usr/share/bobbycar-generic/crypt.cjs';
+import { renderNavbar } from './navbar.js';
+import { getUserData, bobbyDB } from './dbv1.js';
 
-const button_array = [
+export const router = express.Router();
+
+export const button_array = [
     'Left',
     'Right',
     'Up',
@@ -25,7 +26,7 @@ const button_array = [
     'Extra4',
 ];
 
-function handleAnonymousUser(req, res, next) {
+export function handleAnonymousUser(req, res, next) {
     const loggedIn = isLoggedIn(req, res);
     if ((req.url === '/' || req.url.replace('.html', '') === '/index') && !(req.headers.referer && req.headers.referer.includes('login')) && !loggedIn) {
         res.redirect('/login');
@@ -37,12 +38,12 @@ function handleAnonymousUser(req, res, next) {
     next();
 }
 
-function getHTMLTitle(req, override) {
+export function getHTMLTitle(req, override) {
     const title = override || (req.url.includes('index') ? 'Home' : req.url.substring(req.url.lastIndexOf('/') + 1).replace('.html', '').split('?')[0])
     return capitalize(decodeURIComponent(title))
 }
 
-function getUsername(req) {
+export function getUsername(req) {
     const decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
         return '';
@@ -50,7 +51,7 @@ function getUsername(req) {
     return JSON.parse(decryptedData).username;
 }
 
-function getDecryptedData(req) {
+export function getDecryptedData(req) {
     const decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
         return null;
@@ -58,7 +59,7 @@ function getDecryptedData(req) {
     return JSON.parse(decryptedData);
 }
 
-async function getHTMLProfilePicture(req, optional_userdata) {
+export async function getHTMLProfilePicture(req, optional_userdata) {
     const decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
         return '/img/undraw_profile.svg';
@@ -76,7 +77,7 @@ async function getHTMLProfilePicture(req, optional_userdata) {
     return user_data.avatar_url;
 }
 
-async function getHTMLProfilePictureText(req, optional_userdata) {
+export async function getHTMLProfilePictureText(req, optional_userdata) {
     const decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
         return 'You must be logged in to change your profile picture.';
@@ -89,7 +90,7 @@ async function getHTMLProfilePictureText(req, optional_userdata) {
     }
 }
 
-async function renderEJS(req, res, next) {
+export async function renderEJS(req, res, next) {
     // check if file contains file extension
     if (req.url.split('.htm')[0].includes('.')) {
         next();
@@ -117,7 +118,7 @@ async function renderEJS(req, res, next) {
     })
 }
 
-async function generateRenderOptions(req) {
+export async function generateRenderOptions(req) {
     const decryptedData = getDecryptedData(req);
     const username = decryptedData ? decryptedData.username : '';
     const data = await getUserData(username);
@@ -155,18 +156,13 @@ router.use(async (req, res, next) => {
     await renderEJS(req, res, next);
 });
 
-module.exports = { 
-    public_router: router,
-    getHTMLTitle,
-    getHTMLUsername: getUsername,
-    getHTMLProfilePicture,
-    getHTMLProfilePictureText,
-    renderEJS,
-    generateRenderOptions,
-};
+export default router;
 
-router.use('/bobbycars', require('./bobbycar').default_router);
-router.use('/api/bobbycars', require('./bobbycar').api_router);
-router.use('/api/qr', require('./qr').api_router);
+import { default_router, api_router } from './bobbycar.js';
+import { router as qr_api_router } from './qr.js';
+
+router.use('/bobbycars', default_router);
+router.use('/api/bobbycars', api_router);
+router.use('/api/qr', qr_api_router);
 
 router.use(express.static('views/public'));

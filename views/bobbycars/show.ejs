@@ -8,7 +8,7 @@
         <span class="badge badge-primary">
             <%- data.capitalize(data.bobbycar.type) %>
         </span>
-        <span class="badge badge-danger" id="online-indicator">
+        <span class="badge badge-danger <%- data.bobbycar.type === 'anhaenger' ? 'd-none':'' %>" id="online-indicator">
             Offline
         </span>
         <%- data.bobbycar.name %>
@@ -46,29 +46,29 @@
         </div>
     <% } %>
     <hr>
-    <form class="row g-3">
-        <div class="col-md-4">
-            <div class="form-group">
-                <h4>OTA Password</h4>
-                <input type="password" id="bobbycarPassword" class="form-control" />
-                <br />
-                <button class="toggle-visibility btn btn-primary btn-sm" type="button" for="bobbycarPassword">Show Password</button>
-                <button class="btn btn-success btn-sm" id="save-bobby-password" type="button" for="bobbycarPassword">Save Password</button>
-                <div id="save-password-visualizer"></div>
-            </div>
-        </div>
-    </form>
-    <hr>
-    <p>Created on <timefix><%- data.bobbycar.created_at %></timefix></p>
-    <hr>
     <% if (data.bobbycar.type !== 'anhaenger') { %>
+        <form class="row g-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <h4>OTA Password</h4>
+                    <input type="password" id="bobbycarPassword" class="form-control" />
+                    <br />
+                    <button class="toggle-visibility btn btn-primary btn-sm" type="button" for="bobbycarPassword">Show Password</button>
+                    <button class="btn btn-success btn-sm" id="save-bobby-password" type="button" for="bobbycarPassword">Save Password</button>
+                    <div id="save-password-visualizer"></div>
+                </div>
+            </div>
+        </form>
+        <hr>
+        <p>Created on <timefix><%- data.bobbycar.created_at %></timefix></p>
+        <hr>
         <% if (data.grafana_id) { %>
         <a href="https://grafana.bobbycar.cloud/d/r3_qLmtnk/bobbydashboard-v1-0?var-username=username%20in%20(select%20id%20from%20bobbycloud.usernames%20where%20name%3D%27<%-data.bobbycar.ota_name %>%27)" target="_blank" class="btn btn-primary">View in Grafana</a>
         <% } %>
         <a href="/api/bobbycars/<%- data.bobbycar.owner %>/<%- data.bobbycar.name %>/register_grafana" class="btn btn-success <%- data.is_grafana_registered ? 'disabled' : '' %>"><%- data.grafana_id ? `Grafana ID: ${data.grafana_id}` : 'Register in Grafana' %></a>
+        <a href="/bobbycars/<%- data.bobbycar.owner %>/<%- data.bobbycar.name %>/connect" class="btn btn-success disabled only-when-online">Connect via WebSocket</a>
     <% } %>
     <a href="/bobbycars/new?edit=<%- data.bobbycar.id %>" class="btn btn-warning">Edit</a>
-    <a href="/bobbycars/<%- data.bobbycar.owner %>/<%- data.bobbycar.name %>/connect" class="btn btn-success disabled only-when-online">Connect via WebSocket</a>
     <a href="/api/bobbycars/<%- data.bobbycar.owner %>/<%- encodeURI(data.bobbycar.name) %>/delete" class="btn btn-danger">Delete <%- data.capitalize(data.bobbycar.type) %></a>
 </div>
 <!-- /.container-fluid -->

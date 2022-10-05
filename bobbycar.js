@@ -1,12 +1,13 @@
 // this file handles everything that is for bobbycars
-const express = require('express');
+import express from 'express';
+import { generateRenderOptions } from './public.js';
+import { verify, checkOrigin } from './usermanager.js';
+import bodyParser from 'body-parser';
+import { bobbyDB, Bobbycar, Anhänger, registerGrafana, isGrafanaRegistered, getGrafanaID } from './dbv1.js';
+import axios from 'axios';
+
 const api = express.Router();
 const default_router = express.Router();
-const { generateRenderOptions } = require('./public');
-const { verify, checkOrigin } = require('./usermanager');
-const bodyParser = require('body-parser');
-const { bobbyDB, Bobbycar, Anhänger, registerGrafana, isGrafanaRegistered, getGrafanaID } = require('./db');
-const axios = require('axios');
 
 api.use(bodyParser.json());
 api.use(bodyParser.urlencoded({ extended: true }));
@@ -273,7 +274,7 @@ default_router.get('/:owner/:name/connect', async (req, res) => {
 });
 
 
-module.exports = {
+export {
     default_router,
-    api_router: api,
-}
+    api as api_router
+};

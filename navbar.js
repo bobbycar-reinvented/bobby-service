@@ -1,12 +1,11 @@
-const { AES_256_GCM_decrypt } = require('/usr/share/bobbycar-generic/crypt')
-const { get_token } = require('./usermanager')
-const { sortBobbycarAlphabetically } = require('./utils');
-
-const { bobbyDB } = require('./db');
+import { AES_256_GCM_decrypt } from '/usr/share/bobbycar-generic/crypt.cjs';
+import { get_token } from './usermanager.js';
+import { sortBobbycarAlphabetically } from './utils.js';
+import { bobbyDB } from './dbv1.js';
 
 var id;
 
-async function generateBobbycars(req) {
+export async function generateBobbycars(req) {
 
     let template = '';
     let decryptedData = AES_256_GCM_decrypt(get_token(req));
@@ -32,7 +31,7 @@ async function generateBobbycars(req) {
     return template;
 }
 
-async function generateAnhaenger(req) {
+export async function generateAnhaenger(req) {
 
     let template = '';
     let decryptedData = AES_256_GCM_decrypt(get_token(req));
@@ -58,7 +57,7 @@ async function generateAnhaenger(req) {
     return template;
 }
 
-function generateGrafanaUrl(req) {
+export function generateGrafanaUrl(req) {
     let decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
         return ''
@@ -132,7 +131,7 @@ const navbar = {
     title: 'Bobbycar Graz',
 }
 
-async function navitem(url, name, icon) {
+export async function navitem(url, name, icon) {
     return typeof icon === 'string' ? `
     <li class="nav-item">
         <a class="nav-link" href="${url}">
@@ -147,7 +146,7 @@ async function navitem(url, name, icon) {
     `;
 }
 
-async function heading(name) {
+export async function heading(name) {
     return `
     <div class="sidebar-heading">
         ${name || ''}
@@ -155,13 +154,13 @@ async function heading(name) {
     `;
 }
 
-async function divider(isDark) {
+export async function divider(isDark) {
     // change color of hr
     let classList = isDark ? 'sidebar-divider bg-dark mb-0' : 'sidebar-divider mb-0';
     return `<hr class="${classList}">`;
 }
 
-async function collapseItem(name, link, icon) {
+export async function collapseItem(name, link, icon) {
     return typeof icon === 'string' ? `
     <a class="collapse-item" href="${link}"><i class="fas fa-fw ${icon}"></i>${name}</a>
     ` : `
@@ -169,7 +168,7 @@ async function collapseItem(name, link, icon) {
     `;
 }
 
-async function collapse(name, subname, icon, children, req) {
+export async function collapse(name, subname, icon, children, req) {
 
     let renderedChildren = '';
     for (const child of children) {
@@ -205,7 +204,7 @@ async function collapse(name, subname, icon, children, req) {
     `;
 }
 
-async function renderItem(item, req) {
+export async function renderItem(item, req) {
     id++;
     if (item.type === 'divider') {
         return await divider();
@@ -224,7 +223,7 @@ async function renderItem(item, req) {
     }
 }
 
-async function renderNavbar(req) {
+export async function renderNavbar(req) {
     id = 0;
 
     const { elements, title } = navbar;
@@ -262,6 +261,4 @@ async function renderNavbar(req) {
     `;
 }
 
-module.exports = {
-    renderNavbar,
-};
+export default renderNavbar;

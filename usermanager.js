@@ -1,15 +1,17 @@
-const { AES_256_GCM_decrypt, AES_256_GCM_encrypt } = require('/usr/share/bobbycar-generic/crypt')
-const express = require('express');
-const router = express.Router();
-const authenticated_router = express.Router();
-const bodyParser = require('body-parser');
-const axios = require('axios');
-const { github_client_id, github_client_secret, valid_orgs } = require('./config');
-const { capitalize } = require('./utils');
-const moment = require('moment');
-const { register_user, validUsername, getUserType, isPasswordLogin, verifyPassword, getUserData } = require('./db');
-const rateLimit = require("express-rate-limit");
-require('dotenv').config();
+import { AES_256_GCM_decrypt, AES_256_GCM_encrypt } from '/usr/share/bobbycar-generic/crypt.cjs';
+import express from 'express';
+import bodyParser from 'body-parser';
+import axios from 'axios';
+import { github_client_id, github_client_secret, valid_orgs } from './config.js';
+import { capitalize } from './utils.js';
+import moment from 'moment';
+import { register_user, validUsername, getUserType, isPasswordLogin, verifyPassword, getUserData } from './dbv1.js';
+import rateLimit from "express-rate-limit";
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const router = express.Router();
+export const authenticated_router = express.Router();
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -21,7 +23,7 @@ const limiter = rateLimit({
 
 const LOGIN_VALID = 1000 * 60 * 60 * 24 * 30; // 30 days
 
-function get_token(req) {
+export function get_token(req) {
     let token = null;
     try {
         token = req.body.auth;
@@ -44,7 +46,7 @@ function get_token(req) {
     return token;
 }
 
-function verify(req, res, next) {
+export function verify(req, res, next) {
     const token = get_token(req);
 
     if (!token) {
@@ -71,7 +73,7 @@ function verify(req, res, next) {
     next();
 }
 
-function checkOrigin(req, res, next) {
+export function checkOrigin(req, res, next) {
     const origin = req.headers.origin;
     if (origin === "https://service.bobbycar.cloud") {
         next();
@@ -80,7 +82,7 @@ function checkOrigin(req, res, next) {
     }
 }
 
-function update(req, res, next) {
+export function update(req, res, next) {
 
     const token = get_token(req);
 
@@ -107,7 +109,7 @@ function update(req, res, next) {
     next();
 }
 
-function isLoggedIn(req, res) {
+export function isLoggedIn(req, res) {
     const token = get_token(req);
 
     if (!token) {
@@ -126,7 +128,7 @@ function isLoggedIn(req, res) {
     return true;
 }
 
-async function generateAccountDetails(req, optional_userdata) {
+export async function generateAccountDetails(req, optional_userdata) {
 
     let decryptedData = AES_256_GCM_decrypt(get_token(req));
     if (!decryptedData) {
@@ -151,7 +153,7 @@ async function generateAccountDetails(req, optional_userdata) {
     `;
 }
 
-async function handleOauthLogin(access_token, scope, token_type, res) {
+export async function handleOauthLogin(access_token, scope, token_type, res) {
 
     let scopes = scope.split(',');
     const needed_scopes = ['read:user', 'read:org'];
@@ -370,5 +372,3 @@ authenticated_router.get('/github_token', async (req, res) => {
 authenticated_router.use((req, res, next) => {
     res.sendStatus(404);
 });
-
-module.exports = { router, get_token, checkOrigin, isLoggedIn, update, generateAccountDetails, verify };

@@ -1,10 +1,18 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const router = express.Router();
-const path = require('path');
-const fs = require('fs');
-const rateLimit = require("express-rate-limit");
-const { checkUsername } = require('./utils');
+// const express = require('express');
+// const bodyParser = require('body-parser');
+// const router = express.Router();
+// const path = require('path');
+// const fs = require('fs');
+// const rateLimit = require("express-rate-limit");
+// const { checkUsername } = require('./utils');
+import express from "express";
+import bodyParser from "body-parser";
+import path from "path";
+import fs from "fs";
+import rateLimit from "express-rate-limit";
+import { checkUsername, __dirname } from "./utils.js";
+
+export const router = express.Router();
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -16,7 +24,7 @@ const limiter = rateLimit({
 
 const files = {};
 
-function handleQr(req, res, next) {
+export function handleQr(req, res, next) {
     const { username } = req.params;
 
     if (!checkUsername(username)) {
@@ -37,7 +45,7 @@ function handleQr(req, res, next) {
     console.log('sent qr for ' + username);
 }
 
-function saveQR(username, data) {
+export function saveQR(username, data) {
     const filepath = path.join(__dirname, 'tmp', username + '.qr');
 
     if (!checkUsername(username)) {
@@ -53,7 +61,7 @@ function saveQR(username, data) {
     console.log('saved qr for ' + username);
 }
 
-function deleteQR(username) {
+export function deleteQR(username) {
     const filepath = path.join(__dirname, 'tmp', username + '.qr');
 
     if (!checkUsername(username)) {
@@ -66,7 +74,7 @@ function deleteQR(username) {
     console.log('deleted qr for ' + username);
 }
 
-function cleanTmpDir() {
+export function cleanTmpDir() {
     const files = fs.readdirSync(path.join(__dirname, 'tmp'), { withFileTypes: true });
     for (const file of files) {
         if (file.name.endsWith('.qr')) {
@@ -112,6 +120,4 @@ setInterval(() => {
 
 cleanTmpDir();
 
-module.exports = {
-    api_router: router,
-}
+export default router;

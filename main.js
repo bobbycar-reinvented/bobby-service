@@ -1,8 +1,10 @@
-const express = require('express');
+import express from 'express';
+import * as um from './usermanager.js';
+import { router as public_router, generateRenderOptions } from './public.js';
+import cookieParser from 'cookie-parser';
+import { __dirname } from './utils.js';
+
 const app = express();
-const um = require('./usermanager');
-const { public_router, generateRenderOptions } = require('./public');
-const cookieParser = require('cookie-parser');
 
 app.disable('x-powered-by');
 

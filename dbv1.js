@@ -1,8 +1,9 @@
-const crypto = require('crypto');
-require('dotenv').config();
-const uuid = require('uuid').v4;
+import crypto from 'crypto';
+import { config } from 'dotenv';
+config();
+import uuid from 'uuid';
+import { ClickHouse } from 'clickhouse';
 
-const { ClickHouse } = require('clickhouse');
 const clickhouse_config = {
     basicAuth: {
         username: process.env.CLICKHOUSE_USERNAME,
@@ -12,18 +13,21 @@ const clickhouse_config = {
 };
 const clickhouse = new ClickHouse(clickhouse_config);
 
-function esc(a){
+export function esc(a){
+    if (!a) {
+        return '';
+    }
     return a.replace(/\\/g, "\\\\")
         .replace(/'/g, "\\'");
 }
 
-class Bobbycar {
+export class Bobbycar {
     constructor(color, owner, type, features, id, name, ota_name, password) {
         this.color = color;
         this.owner = owner;
         this.type = type;
         this.features = features;
-        this.id = id || uuid();
+        this.id = id || uuid.v4();
         this.name = name;
         this.ota_name = ota_name;
         this.createdAt = Math.floor(Date.now() / 1000);
@@ -31,13 +35,13 @@ class Bobbycar {
     }
 }
 
-class Anhänger {
+export class Anhänger {
     constructor(owner, type, name, id) {
         this.color = null;
         this.owner = owner;
         this.type = type;
         this.features = null;
-        this.id = id || uuid();
+        this.id = id || uuid.v4();
         this.name = name;
         this.ota_name = null;
         this.createdAt = Math.floor(Date.now() / 1000);
@@ -45,7 +49,7 @@ class Anhänger {
     }
 }
 
-async function register_user(username, password, type, other_data = {}) {
+export async function register_user(username, password, type, other_data = {}) {
     // new clickhouse implementation
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
@@ -68,7 +72,7 @@ async function register_user(username, password, type, other_data = {}) {
     await db_stream.end();
 }
 
-async function getProfilePictureURL(username) {
+export async function getProfilePictureURL(username) {
     const r = await clickhouse.query(`SELECT avatar_url FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}'`).toPromise();
     
     if (r.length === 0) {
@@ -78,19 +82,19 @@ async function getProfilePictureURL(username) {
     return r[0];
 }
 
-async function getUserData(username) {
+export async function getUserData(username) {
     // get everything from the user table
     const r = await clickhouse.query(`SELECT * FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}'`).toPromise();
     return r[0];
 }
 
-async function validUsername(username) {
+export async function validUsername(username) {
     // old: return Object.keys(getUserJson()).includes(username);
     const r = await clickhouse.query(`SELECT username FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}'`).toPromise();
     return r.length > 0;
 }
 
-async function isPasswordLogin(username) {
+export async function isPasswordLogin(username) {
     // old: return getUserJson()[username].type === 'password';
     const r = await clickhouse.query(`SELECT type FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}'`).toPromise();
     if (r.length === 0) {
@@ -100,7 +104,7 @@ async function isPasswordLogin(username) {
     return r[0].type === 'password';
 }
 
-async function getUserType(username) {
+export async function getUserType(username) {
     // old: return getUserJson()[username].type;
     const r = await clickhouse.query(`SELECT type FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}'`).toPromise();
     
@@ -111,7 +115,7 @@ async function getUserType(username) {
     return r[0].type;
 }
 
-async function verifyPassword(username, password) {
+export async function verifyPassword(username, password) {
     
     const r = await clickhouse.query(`SELECT salt, hash FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}'`).toPromise();
     if (r.length === 0) {
@@ -123,12 +127,12 @@ async function verifyPassword(username, password) {
     return hash === r[0].hash;
 }
 
-async function isAdmin(username) {
+export async function isAdmin(username) {
     const r = await clickhouse.query(`SELECT username FROM ${process.env.USER_TABLE} WHERE username = '${esc(username)}' AND isAdmin = true`).toPromise();
     return r.length > 0;
 }
 
-async function saveBobbycar(bobbycar, username) {
+export async function saveBobbycar(bobbycar, username) {
     
     const data = [
         bobbycar.id,
@@ -147,7 +151,7 @@ async function saveBobbycar(bobbycar, username) {
     await db_stream.end();
 }
 
-async function getBobbycar(username, id) {
+export async function getBobbycar(username, id) {
     const r = await clickhouse.query(`SELECT * FROM ${process.env.BOBBY_TABLE} WHERE id = '${esc(id)}' AND owner = '${esc(username)}'`).toPromise();
     if (r.length === 0) {
         return null;
@@ -158,7 +162,7 @@ async function getBobbycar(username, id) {
     return data;
 }
 
-async function deleteBobbycar(username, bobbycar) {
+export async function deleteBobbycar(username, bobbycar) {
     const id = bobbycar.id;
 
     const grafana_id = await getGrafanaID(bobbycar.ota_name);
@@ -170,7 +174,7 @@ async function deleteBobbycar(username, bobbycar) {
     return r.affectedRows > 0;
 }
 
-async function getBobbycarID(username, bobbycar_name) {
+export async function getBobbycarID(username, bobbycar_name) {
     const r = await clickhouse.query(`SELECT id FROM ${process.env.BOBBY_TABLE} WHERE name = '${esc(bobbycar_name)}' AND owner = '${esc(username)}'`).toPromise();
     if (r.length === 0) {
         return null;
@@ -178,7 +182,7 @@ async function getBobbycarID(username, bobbycar_name) {
     return r[0].id;
 }
 
-async function replaceBobbycar(username, id, bobbycar) {
+export async function replaceBobbycar(username, id, bobbycar) {
     await clickhouse.query(`ALTER TABLE ${process.env.BOBBY_TABLE} DELETE WHERE id = '${esc(id)}' AND owner = '${esc(username)}'`).toPromise();
 
     const data = [
@@ -198,7 +202,7 @@ async function replaceBobbycar(username, id, bobbycar) {
     await db_stream.end();
 }
 
-async function listBobbycars(username) {
+export async function listBobbycars(username) {
     const r = await clickhouse.query(`SELECT * FROM ${process.env.BOBBY_TABLE} WHERE owner = '${esc(username)}'`).toPromise();
     if (r.length === 0) {
         return [];
@@ -207,7 +211,7 @@ async function listBobbycars(username) {
     return r;
 }
 
-async function getBobbycarAsJson(username, bobbycar_name) {
+export async function getBobbycarAsJson(username, bobbycar_name) {
     const r = await clickhouse.query(`SELECT * FROM ${process.env.BOBBY_TABLE} WHERE name = '${esc(bobbycar_name)}' AND owner = '${esc(username)}'`).toPromise();
     if (r.length === 0) {
         return null;
@@ -218,7 +222,7 @@ async function getBobbycarAsJson(username, bobbycar_name) {
     return data;
 }
 
-async function registerGrafana(ota_name) {
+export async function registerGrafana(ota_name) {
     let id = 0;
     let id_query = await clickhouse.query(`SELECT max(id)+1 as id, max(name = '${esc(ota_name)}'? toNullable(${process.env.GRAFANA_TABLE}.id) : null) as duplicate FROM ${process.env.GRAFANA_TABLE}`).toPromise();
     
@@ -236,12 +240,12 @@ async function registerGrafana(ota_name) {
     return r > 0;
 }
 
-async function isGrafanaRegistered(ota_name) {
+export async function isGrafanaRegistered(ota_name) {
     const r = await clickhouse.query(`SELECT * FROM ${process.env.GRAFANA_TABLE} WHERE name = '${esc(ota_name)}'`).toPromise();
     return r.length > 0;
 }
 
-async function getGrafanaID(ota_name) {
+export async function getGrafanaID(ota_name) {
     const r = await clickhouse.query(`SELECT id FROM ${process.env.GRAFANA_TABLE} WHERE name = '${esc(ota_name)}'`).toPromise();
     if (r.length === 0) {
         return null;
@@ -249,31 +253,17 @@ async function getGrafanaID(ota_name) {
     return r[0].id;
 }
 
-async function unregisterGrafana(ota_name) {
+export async function unregisterGrafana(ota_name) {
     const r = await clickhouse.query(`ALTER TABLE ${process.env.GRAFANA_TABLE} DELETE WHERE name = '${esc(ota_name)}'`).toPromise();
     return r > 0;
 }
 
-module.exports = {
-    register_user,
-    getProfilePictureURL,
-    getUserData,
-    validUsername,
-    isPasswordLogin,
-    getUserType,
-    verifyPassword,
-    registerGrafana,
-    isGrafanaRegistered,
-    getGrafanaID,
-    bobbyDB: {
-        saveBobbycar,
-        getBobbycar,
-        deleteBobbycar,
-        getBobbycarID,
-        replaceBobbycar,
-        listBobbycars,
-        getBobbycarAsJson,
-    },
-    Bobbycar,
-    Anhänger,
+export const bobbyDB = {
+    saveBobbycar,
+    getBobbycar,
+    deleteBobbycar,
+    getBobbycarID,
+    replaceBobbycar,
+    listBobbycars,
+    getBobbycarAsJson,
 };
