@@ -50,8 +50,8 @@ async function generateGithubFeed(element, page = 1) {
         const agoString = moment(event.created_at).fromNow();
 
         const event_name_map = {
-            // PushEvent: `pushed to <a href="https://github.com/${event.repo.name}" target="_blank" rel="noopener noreferrer" class="github-repo github-link">${event.repo.name}</a>`,
-            // PullRequestEvent: `opened a pull request in <a href="https://github.com/${event.repo.name}" target="_blank" rel="noopener noreferrer" class="github-repo github-link">${event.repo.name}</a>`,
+            PushEvent: `pushed to <a href="https://github.com/${event.repo.name}" target="_blank" rel="noopener noreferrer" class="github-repo github-link">${event.repo.name}</a>`,
+            PullRequestEvent: `opened a pull request in <a href="https://github.com/${event.repo.name}" target="_blank" rel="noopener noreferrer" class="github-repo github-link">${event.repo.name}</a>`,
             CreateEvent: `created a ${event.payload.ref_type} ${event.payload.ref_type === 'repository' ? '' : 'in'} <a href="https://github.com/${event.repo.name}" target="_blank" rel="noopener noreferrer" class="github-repo github-link">${event.repo.name}</a>`,
         };
 
@@ -141,7 +141,9 @@ async function generateGithubFeed(element, page = 1) {
                         template += `
                             <div class="event__create__branch">
                                 <div class="event__create__branch__info">
-                                    <a href="https://
+                                    <a href="https://google.com">foo</a>
+                                </div>
+                            </div>
                             `;
                         break;
                 }
