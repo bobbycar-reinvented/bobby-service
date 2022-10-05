@@ -197,7 +197,8 @@ function handle_save_nvs_key(event, bobby_ws_instance) {
             return;
         }
     }
-    bobby_ws_instance.send(JSON.stringify({ type: 'setConfig', nvskey: key, value }));
+    // bobby_ws_instance.send(JSON.stringify({ type: 'setConfig', nvskey: key, value }));
+    bobby_ws_instance.setNVSKey(key, value);
 }
 
 function handle_reset_nvs_key(event, bobby_ws_instance) {
@@ -1277,6 +1278,10 @@ class BobbyWS {
 
         const msg = { type: "btnPressed", btn: button_id };
         this.send(JSON.stringify(msg));
+    }
+
+    setNVSKey(key, value) {
+        this.send(JSON.stringify({ type: 'setConfig', nvskey: key, value }));
     }
 }
 

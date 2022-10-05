@@ -85,6 +85,7 @@
                         <div class="container-fluid mb-2">
                             <button onclick="ws.download_nvs()" disabled class="btn btn-primary btn-sm enable-nvs-loaded">Download NVS</button>
                             <button onclick="ws.import_nvs()" disabled class="btn btn-warning btn-sm enable-nvs-loaded">Import NVS</button>
+                            <button onclick="ws.setNVSKey('udpToken', '<%- data.grafana_id %>')" disabled class="btn btn-success btn-sm enable-nvs-loaded">Set udpToken</button>
                         </div>
                         <table class="table table-striped">
                             <thead>

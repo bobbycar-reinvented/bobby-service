@@ -3,7 +3,8 @@ import express from 'express';
 import { generateRenderOptions } from './public.js';
 import { verify, checkOrigin } from './usermanager.js';
 import bodyParser from 'body-parser';
-import { bobbyDB, Bobbycar, Anhänger, registerGrafana, isGrafanaRegistered, getGrafanaID } from './dbv1.js';
+import { bobbyDB, Bobbycar, Anhänger } from './dbv1.js';
+import { registerGrafana, isGrafanaRegistered, getGrafanaID } from './dbv2.js';
 import axios from 'axios';
 
 const api = express.Router();

@@ -222,7 +222,8 @@ export async function getBobbycarAsJson(username, bobbycar_name) {
     return data;
 }
 
-export async function registerGrafana(ota_name) {
+// @deprecated
+export async function __registerGrafana(ota_name) {
     let id = 0;
     let id_query = await clickhouse.query(`SELECT max(id)+1 as id, max(name = '${esc(ota_name)}'? toNullable(${process.env.GRAFANA_TABLE}.id) : null) as duplicate FROM ${process.env.GRAFANA_TABLE}`).toPromise();
     
@@ -240,12 +241,14 @@ export async function registerGrafana(ota_name) {
     return r > 0;
 }
 
-export async function isGrafanaRegistered(ota_name) {
+// @deprecated
+export async function __isGrafanaRegistered(ota_name) {
     const r = await clickhouse.query(`SELECT * FROM ${process.env.GRAFANA_TABLE} WHERE name = '${esc(ota_name)}'`).toPromise();
     return r.length > 0;
 }
 
-export async function getGrafanaID(ota_name) {
+// @deprecated
+export async function __getGrafanaID(ota_name) {
     const r = await clickhouse.query(`SELECT id FROM ${process.env.GRAFANA_TABLE} WHERE name = '${esc(ota_name)}'`).toPromise();
     if (r.length === 0) {
         return null;
@@ -253,7 +256,8 @@ export async function getGrafanaID(ota_name) {
     return r[0].id;
 }
 
-export async function unregisterGrafana(ota_name) {
+// @deprecated
+export async function __unregisterGrafana(ota_name) {
     const r = await clickhouse.query(`ALTER TABLE ${process.env.GRAFANA_TABLE} DELETE WHERE name = '${esc(ota_name)}'`).toPromise();
     return r > 0;
 }
