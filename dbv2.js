@@ -14,22 +14,22 @@ const clickhouse_config = {
 const clickhouse = new ClickHouse(clickhouse_config);
 const TABLE_NAME = process.env.AUTH_TABLE;
 
-export async function registerGrafana(ota_name) {
+export async function registerGrafana(username) {
     const token = uuid.v4();
-    const query = `INSERT INTO ${TABLE_NAME} (token, ota_name) VALUES ('${token}', '${esc(ota_name)}')`;
+    const query = `INSERT INTO ${TABLE_NAME} (token, username) VALUES ('${token}', '${esc(username)}')`;
 
     const { r } = await clickhouse.query(query).toPromise();
     return r > 0;
 }
 
-export async function unregisterGrafana(ota_name) {
-    const query = `ALTER TABLE ${TABLE_NAME} DELETE WHERE ota_name = '${esc(ota_name)}'`;
+export async function unregisterGrafana(username) {
+    const query = `ALTER TABLE ${TABLE_NAME} DELETE WHERE username = '${esc(username)}'`;
     const { r } = await clickhouse.query(query).toPromise();
     return r > 0;
 }
 
-export async function getGrafanaToken(ota_name) {
-    const query = `SELECT token FROM ${TABLE_NAME} WHERE ota_name = '${esc(ota_name)}'`;
+export async function getGrafanaToken(username) {
+    const query = `SELECT token FROM ${TABLE_NAME} WHERE username = '${esc(username)}'`;
     const r = await clickhouse.query(query).toPromise();
 
     if (r.length === 0) {
@@ -39,12 +39,12 @@ export async function getGrafanaToken(ota_name) {
     return r[0].token;
 }
 
-export async function getGrafanaID(ota_name) {
-    return getGrafanaToken(ota_name);
+export async function getGrafanaID(username) {
+    return getGrafanaToken(username);
 }
 
-export async function isGrafanaRegistered(ota_name) {
-    const query = `SELECT * FROM ${TABLE_NAME} WHERE ota_name = '${esc(ota_name)}'`;
+export async function isGrafanaRegistered(username) {
+    const query = `SELECT * FROM ${TABLE_NAME} WHERE username = '${esc(username)}'`;
     const r = await clickhouse.query(query).toPromise();
     return r.length > 0;
 }
