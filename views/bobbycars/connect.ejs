@@ -59,15 +59,24 @@
 
                 <hr>
 
-                <div class="container-fluid container-test2">
+                <div class="container-fluid container-livedata">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 id="info-loading">
-                            Remote Display
+                            Livedata
                         </h2>
-                        <a href="#collapseTest2" data-toggle="collapse" class="btn btn-primary btn-sm h-maxc collapse-toggler" id="test2-expander"><i id="test2-toggler-icon" class="bi bi-caret-down-fill"></i></a>
+                        <a href="#collapseLivedata" data-toggle="collapse" class="btn btn-secondary btn-sm h-maxc collapse-toggler" id="livedata-expander"><i id="livedata-toggler-icon" class="bi bi-caret-down-fill"></i></a>
                     </div>
-                    <div class="collapse show" id="collapseTest2">
-                        <div id="display-remote"></div>
+                    <div class="collapse show" id="collapseLivedata">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Key</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Value</th>
+                                </tr>
+                            </thead>    
+                            <tbody id="display-livedata"></tbody>             
+                        </table>
                     </div>
                 </div>
 
@@ -103,15 +112,15 @@
 
                 <hr>
 
-                <div class="container-fluid container-test3">
+                <div class="container-fluid container-test2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 id="info-loading">
-                            Test3
+                            Remote Display
                         </h2>
-                        <a href="#collapseTest3" data-toggle="collapse" class="btn btn-secondary btn-sm h-maxc collapse-toggler" id="test3-expander"><i id="test3-toggler-icon" class="bi bi-caret-down-fill"></i></a>
+                        <a href="#collapseTest2" data-toggle="collapse" class="btn btn-primary btn-sm h-maxc collapse-toggler" id="test2-expander"><i id="test2-toggler-icon" class="bi bi-caret-down-fill"></i></a>
                     </div>
-                    <div class="collapse show" id="collapseTest3">
-                            Test3
+                    <div class="collapse show" id="collapseTest2">
+                        <div id="display-remote"></div>
                     </div>
                 </div>
 

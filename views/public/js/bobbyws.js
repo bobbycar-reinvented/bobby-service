@@ -4,6 +4,41 @@ let connected_indicator;
 let grabbed = false;
 let ip_pings = {};
 
+const KEY_DESC_MAPPING = {
+    "fls": "Front Left Motor Speed",
+    "fla": "Front Left Motor Current",
+    "fle": "Front Left Motor Error",
+    "frs": "Front Right Motor Speed",
+    "fra": "Front Right Motor Current",
+    "fre": "Front Right Motor Error",
+    "fbv": "Front Voltage",
+    "fbt": "Front Temperature",
+    "bls": "Back Left Speed",
+    "bla": "Back Left Current",
+    "ble": "Back Left Error",
+    "brs": "Back Right Speed",
+    "bra": "Back Right Current",
+    "bre": "Back Right Error",
+    "bbv": "Back Voltage",
+    "bbt": "Back Temperature",
+    "pcg": "Gas",
+    "pcb": "Brems",
+    "prg": "Raw Gas",
+    "prb": "Raw Brems",
+    "mdr": "Meters driven now",
+    "mdt": "Meters driven total",
+    "bap": "Battery Percentage",
+    "kml": "Calculated Kilometers Left",
+    "ekm": "Estimted Kilometers Left",
+    "whl": "Wh left",
+    "cdt": "Driving Time",
+    "loc": "Is locked?",
+    "sha": "Git Hash",
+    "upt": "Uptime",
+    "bav": "Battery Average Voltage",
+    "pwr": "Total Power"
+};
+
 function escapeHtml(unsafe) {
     return unsafe
          .replace(/&/g, "&amp;")
@@ -562,6 +597,52 @@ function rgbToHex(r, g, b) {
     return ((r << 16) | (g << 8) | b).toString(16);
 }
 
+function fillLivedataTable(livedata) {
+    const tbody = document.getElementById('display-livedata');
+
+    if (!tbody) {
+        return;
+    }
+
+    for (const key in livedata) {
+        // check if row exists, if not, create it
+        const row_id = `livedata-row-${key}`;
+        if (!document.getElementById(row_id)) {
+            const table_row = document.createElement('tr');
+            const td_key = document.createElement('td');
+            const td_col = document.createElement('td');
+            const td_value = document.createElement('td');
+
+            td_key.innerHTML = key;
+            td_col.innerHTML = KEY_DESC_MAPPING[key];
+            td_value.innerHTML = livedata[key];
+
+            td_key.style.padding = '0';
+            td_col.style.padding = '0';
+            td_value.style.padding = '0';
+
+            td_key.id = `${row_id}-key`;
+            td_col.id = `${row_id}-col`;
+            td_value.id = `${row_id}-value`;
+            
+            table_row.appendChild(td_key);
+            table_row.appendChild(td_col);
+            table_row.appendChild(td_value);
+            table_row.id = row_id;
+
+            tbody.appendChild(table_row);
+        } else {
+            const td_key = document.getElementById(`${row_id}-key`);
+            const td_col = document.getElementById(`${row_id}-col`);
+            const td_value = document.getElementById(`${row_id}-value`);
+
+            td_key.innerHTML = key;
+            td_col.innerHTML = KEY_DESC_MAPPING[key] ?? '-';
+            td_value.innerHTML = livedata[key];
+        }
+    }
+}
+
 // displays websocket messages on a canvas. ws is the websocket object and required for mouse clicks etc
 class RemoteDisplay {
     constructor(element, ws, width, height) {
@@ -1012,6 +1093,9 @@ class BobbyWS {
                     break;
 
                 this.remote_display.handle_data(msg.data);
+                break;
+            case 'udpmessage':
+                fillLivedataTable(msg.data);
                 break;
             default:
                 this.log(`Unknown message type: ${msg.type}`);
