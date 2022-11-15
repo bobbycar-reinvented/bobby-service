@@ -179,7 +179,7 @@ export async function handleOauthLogin(access_token, scope, token_type, res) {
         }).then(async (orgsData) => {
             const username = userData.data.login;
             let validOrganisation = false;
-            for (orga in orgsData.data) {
+            for (let orga in orgsData.data) {
                 const org = orgsData.data[orga];
                 if (valid_orgs.includes(org.login)) {
                     validOrganisation = true;
