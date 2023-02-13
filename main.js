@@ -3,6 +3,7 @@ import * as um from './usermanager.js';
 import { router as public_router, generateRenderOptions } from './public.js';
 import cookieParser from 'cookie-parser';
 import { __dirname } from './utils.js';
+import 'ejs';
 
 const app = express();
 

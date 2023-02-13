@@ -146,6 +146,8 @@ export async function saveBobbycar(bobbycar, username) {
         bobbycar.password,
     ];
 
+    console.log(`insert into ${process.env.BOBBY_TABLE} values (${data.join(', ')})`);
+
     const db_stream = clickhouse.insert(`INSERT INTO ${process.env.BOBBY_TABLE}`).stream();
     await db_stream.writeRow(data);
     await db_stream.end();

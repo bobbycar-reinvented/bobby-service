@@ -97,20 +97,25 @@ api.get('/:owner/:name/register_grafana', async (req, res) => {
         return;
     }
 
-    const bobbycar = await bobbyDB.getBobbycarAsJson(owner, name);
-    const result = await registerGrafana(bobbycar.ota_name);
+    try {
+        const bobbycar = await bobbyDB.getBobbycarAsJson(owner, name);
+        const result = await registerGrafana(bobbycar.ota_name);
 
-    if (!result) {
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+
+        if (result === 'duplicate') {
+            res.redirect(`https://service.bobbycar.cloud/bobbycars/${owner}/${name}?error=grafana_register_duplicate`);
+            return;
+        }
+
+        res.redirect(`https://service.bobbycar.cloud/bobbycars/${owner}/${name}?popup=grafana_register_success`);
+    } catch (e) {
+        console.log(e);
         res.sendStatus(500);
-        return;
     }
-
-    if (result === 'duplicate') {
-        res.redirect(`https://service.bobbycar.cloud/bobbycars/${owner}/${name}?error=grafana_register_duplicate`);
-        return;
-    }
-
-    res.redirect(`https://service.bobbycar.cloud/bobbycars/${owner}/${name}?popup=grafana_register_success`);
 });
 
 api.get('/:owner/:name/is_online', async (req, res) => {
@@ -123,30 +128,35 @@ api.get('/:owner/:name/is_online', async (req, res) => {
         return;
     }
 
-    const bobbycar = await bobbyDB.getBobbycarAsJson(owner, name);
-    if (!bobbycar) {
-        res.sendStatus(404);
-        return;
-    }
-
-    const result = await axios.get('http://127.0.0.1:42431/listAvailable'); // bobbyWebsocket internal backend
-    
-    if (!result.status === 200) {
-        res.json({ status: 'error', error: 'Internal error' });
-        return;
-    }
-
-    const bobbycars = result.data;
-    let online = false;
-    
-    for (let i = 0; i < bobbycars.length; i++) {
-        if (bobbycars[i].name === bobbycar.ota_name) {
-            online = true;
-            break;
+    try {
+        const bobbycar = await bobbyDB.getBobbycarAsJson(owner, name);
+        if (!bobbycar) {
+            res.sendStatus(404);
+            return;
         }
-    }
 
-    res.json({ status: 'success', online });
+        const result = await axios.get('http://127.0.0.1:42431/listAvailable'); // bobbyWebsocket internal backend
+        
+        if (!result.status === 200) {
+            res.json({ status: 'error', error: 'Internal error' });
+            return;
+        }
+
+        const bobbycars = result.data;
+        let online = false;
+        
+        for (let i = 0; i < bobbycars.length; i++) {
+            if (bobbycars[i].name === bobbycar.ota_name) {
+                online = true;
+                break;
+            }
+        }
+
+        res.json({ status: 'success', online });
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
 });
 
 api.use(checkOrigin);
@@ -163,47 +173,56 @@ api.post('/new', async (req, res) => {
     const type = data.type;
     const is_edit = (typeof data['edit-id'] !== 'undefined' && data['edit-id'].length > 0) ? data['edit-id'] : false;
 
-    if (type === 'anhaenger') {
-        
-        const { name } = data;
-        const anhaenger = new Anhänger(username, type, name);
+    console.log(username, type, is_edit);
 
-        if (is_edit) {
-            anhaenger.id = is_edit;
-            await bobbyDB.replaceBobbycar(username, is_edit, anhaenger);
-        } else {
-            await bobbyDB.saveBobbycar(anhaenger, username);
-        }
+    try {
+        if (type === 'anhaenger') {
+            
+            const { name } = data;
+            const anhaenger = new Anhänger(username, type, name);
 
-        res.redirect(`/bobbycars/${username}/${name}`);
-
-    } else if (type === 'bobbycar' || type === 'bobbyquad') {
-        const { color, name, ota_name, password } = data;
-        
-        let features = {}; // anything other than color, type, name
-
-        for (const key in data) {
-            if (key === 'color' || key === 'type' || key === 'name' || key === 'password' || key === 'edit-id') {
-                continue;
+            if (is_edit) {
+                anhaenger.id = is_edit;
+                await bobbyDB.replaceBobbycar(username, is_edit, anhaenger);
+            } else {
+                await bobbyDB.saveBobbycar(anhaenger, username);
             }
-            // try to json parse
-            try {
-                features[key] = JSON.parse(data[key]);
-            } catch (e) {
-                features[key] = data[key];
+
+            res.redirect(`/bobbycars/${username}/${name}`);
+
+        } else if (type === 'bobbycar' || type === 'bobbyquad') {
+            const { color, name, ota_name, password } = data;
+            
+            let features = {}; // anything other than color, type, name
+
+            for (const key in data) {
+                if (key === 'color' || key === 'type' || key === 'name' || key === 'password' || key === 'edit-id') {
+                    continue;
+                }
+                // try to json parse
+                try {
+                    features[key] = JSON.parse(data[key]);
+                } catch (e) {
+                    features[key] = data[key];
+                }
             }
+
+            console.log('creating bobbycar', color, username, type, features, name, ota_name, password);
+
+            let bobbycar = new Bobbycar(color, username, type, features, null, name, ota_name, password);
+
+            if (is_edit) {
+                bobbycar.id = is_edit;
+                await bobbyDB.replaceBobbycar(username, bobbycar.id, bobbycar);
+            } else {
+                await bobbyDB.saveBobbycar(bobbycar, username);
+            }
+
+            res.redirect(`/bobbycars/${username}/${name}`);
         }
-
-        let bobbycar = new Bobbycar(color, username, type, features, null, name, ota_name, password);
-
-        if (is_edit) {
-            bobbycar.id = is_edit;
-            await bobbyDB.replaceBobbycar(username, bobbycar.id, bobbycar);
-        } else {
-            await bobbyDB.saveBobbycar(bobbycar, username);
-        }
-
-        res.redirect(`/bobbycars/${username}/${name}`);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
     }
 });
 
@@ -229,6 +248,11 @@ default_router.use(async (req, res, next) => {
 default_router.get('/:owner/:name', async (req, res) => {
     const { owner, name } = req.params;
 
+    if (!req.decrypted) {
+        res.sendStatus(401);
+        return;
+    }
+
     const username = req.decrypted.username;
 
     if (username !== owner) {
@@ -242,10 +266,15 @@ default_router.get('/:owner/:name', async (req, res) => {
         return;
     }
 
+    console.log('data', data);
+
     const options = await generateRenderOptions(req);
+    console.log('got options');
     options.bobbycar = data;
     options.is_grafana_registered = await isGrafanaRegistered(data.ota_name);
+    console.log('is_grafana_registered', options.is_grafana_registered);
     options.grafana_id = await getGrafanaID(data.ota_name);
+    console.log('grafana_id', options.grafana_id);
 
     res.render('bobbycars/show', { data: options });
 });

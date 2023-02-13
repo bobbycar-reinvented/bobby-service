@@ -22,3 +22,4 @@ views/public/js/qrcode.min.js
 views/public/js/reconnecting-websocket.min.js
 views/public/js/sb-admin-2.js
 views/public/js/sb-admin-2.min.js
+node_modules/
