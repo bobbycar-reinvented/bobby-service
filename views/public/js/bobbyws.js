@@ -36,7 +36,8 @@ const KEY_DESC_MAPPING = {
     "sha": "Git Hash",
     "upt": "Uptime",
     "bav": "Battery Average Voltage",
-    "pwr": "Total Power"
+    "pwr": "Total Power",
+    "per": "Driving Mode Performance",
 };
 
 function escapeHtml(unsafe) {
