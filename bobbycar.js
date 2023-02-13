@@ -74,6 +74,8 @@ api.get('/:owner/:name/delete', async (req, res) => {
         return;
     }
 
+    console.log(username, owner, name);
+
     let id = await bobbyDB.getBobbycarID(owner, name);
     const bobbycar = await bobbyDB.getBobbycar(owner, id);
 

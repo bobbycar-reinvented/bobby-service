@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 config();
 import uuid from 'uuid';
 import { ClickHouse } from 'clickhouse';
+import { getGrafanaID, unregisterGrafana } from './dbv2.js';
 
 const clickhouse_config = {
     basicAuth: {
@@ -240,27 +241,6 @@ export async function __registerGrafana(ota_name) {
     }
     
     const { r } = await clickhouse.query(`INSERT INTO ${process.env.GRAFANA_TABLE} (id, name) VALUES (${id_query.id}, '${esc(ota_name)}')`).toPromise();
-    return r > 0;
-}
-
-// @deprecated
-export async function __isGrafanaRegistered(ota_name) {
-    const r = await clickhouse.query(`SELECT * FROM ${process.env.GRAFANA_TABLE} WHERE name = '${esc(ota_name)}'`).toPromise();
-    return r.length > 0;
-}
-
-// @deprecated
-export async function __getGrafanaID(ota_name) {
-    const r = await clickhouse.query(`SELECT id FROM ${process.env.GRAFANA_TABLE} WHERE name = '${esc(ota_name)}'`).toPromise();
-    if (r.length === 0) {
-        return null;
-    }
-    return r[0].id;
-}
-
-// @deprecated
-export async function __unregisterGrafana(ota_name) {
-    const r = await clickhouse.query(`ALTER TABLE ${process.env.GRAFANA_TABLE} DELETE WHERE name = '${esc(ota_name)}'`).toPromise();
     return r > 0;
 }
 
