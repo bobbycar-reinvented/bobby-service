@@ -38,6 +38,10 @@ const KEY_DESC_MAPPING = {
     "bav": "Battery Average Voltage",
     "pwr": "Total Power",
     "per": "Driving Mode Performance",
+    "wif": "WiFi SSID",
+    "rssi": "WiFi RSSI",
+    "brn": "Git Branch",
+    "idf": "IDF Version"
 };
 
 function escapeHtml(unsafe) {
