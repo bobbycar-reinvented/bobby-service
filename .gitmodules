@@ -1,0 +1,6 @@
+[submodule "reconnecting-websocket"]
+	path = reconnecting-websocket
+	url = git@github.com:joewalnes/reconnecting-websocket.git
+[submodule "sb-admin-2"]
+	path = sb-admin-2
+	url = git@github.com:StartBootstrap/startbootstrap-sb-admin-2.git
