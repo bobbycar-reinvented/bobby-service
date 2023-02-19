@@ -1337,8 +1337,40 @@ class BobbyWS {
         // read file and try to parse, if fails, show error
         const reader = new FileReader();
         reader.onload = (e) => {
-            console.log('[BobbyWS] File loaded');
-            console.log(e.target.result);
+            const element = document.getElementById('import-nvs-json');
+            try {
+                const json = JSON.parse(e.target.result);
+                // generate key value table
+                let html = '';
+
+                for (const key in json) {
+                    html += `
+                    <tr>
+                        <td>${key}</td>
+                        <td>${JSON.stringify(json[key])}</td>
+                        <td><button class="btn btn-success" type="button" onclick="ws.setNVSKey('${key}', JSON.parse(${json[key]}))">Set</button></td>
+                    </tr>
+                    `;
+                }
+
+                // create table
+                element.innerHTML = `
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Set</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${html}
+                    </tbody>
+                </table>
+                `;
+            } catch (e) {
+                element.innerHTML = `<div class="alert alert-danger" role="alert">Invalid JSON file</div>`;
+            }
         };
         reader.readAsText(file);
     }

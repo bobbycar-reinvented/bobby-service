@@ -124,7 +124,7 @@
 
                 <div class="modal fade" id="bobbyImportNvsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                     aria-labelledby="bobbyImportNvsModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog" style="max-width: 45%">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="bobbyImportNvsModalLabel">Import NVS</h5>
@@ -132,7 +132,9 @@
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label for="nvs-file" class="form-label">Upload nvs json</label>
-                                    <input class="form-control" type="file" id="nvs-file" accept="application/json" onchange="ws.import_nvs_file(this)" />
+                                    <input class="form-control" type="file" id="nvs-file" accept="application/json" onchange="ws.import_nvs_file(this.files[0])" />
+                                    <br>
+                                    <div id="import-nvs-json"></div>
                                 </div>                                  
                             </div>
                             <div class="modal-footer">
